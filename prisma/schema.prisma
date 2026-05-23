@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @map("created_at")
+
+  events Event[]
+
+  @@map("categories")
+}
+
+model Event{
+  id Int @id @default(autoincrement())
+  name String
+  location String
+  dateEvent DateTime @map("date_event")
+  description String
+  categoryId Int @map("category_id")
+  pembicaraId Int @map("pembicara_id")
+
+  category Category @relation(fields: [categoryId], references: [id])
+  pembicara Pembicara @relation(fields: [pembicaraId], references: [id])
+
+  createdAt DateTime @map("created_at")
+
+  @@map("events")
+}
+
+model Pembicara{
+  id Int @id @default(autoincrement())
+  name String
+  role String
+  image String
+  createdAt DateTime @map("created_at")
+
+  events Event[] 
+
+  @@map("Pembicaras")
+}
