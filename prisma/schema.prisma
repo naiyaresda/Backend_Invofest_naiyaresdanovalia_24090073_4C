@@ -1,53 +1,62 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model Category{
-  id Int @id @default(autoincrement())
-  name String
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
   createdAt DateTime @map("created_at")
-
-  events Event[]
+  events    Event[]
 
   @@map("categories")
 }
 
-model Event{
-  id Int @id @default(autoincrement())
-  name String
-  location String
-  dateEvent DateTime @map("date_event")
+model Event {
+  id          Int        @id @default(autoincrement())
+  name        String
+  location    String
+  dateEvent   DateTime   @map("date_event")
   description String
-  categoryId Int @map("category_id")
-  pembicaraId Int @map("pembicara_id")
+  categoryId  Int        @map("category_id")
+  pembicaraId Int        @map("pembicara_id")
+  createdAt   DateTime   @map("created_at")
+  category    Category   @relation(fields: [categoryId], references: [id])
+  pembicara   pembicaras @relation(fields: [pembicaraId], references: [id])
 
-  category Category @relation(fields: [categoryId], references: [id])
-  pembicara Pembicara @relation(fields: [pembicaraId], references: [id])
-
-  createdAt DateTime @map("created_at")
-
+  @@index([categoryId], map: "events_category_id_fkey")
+  @@index([pembicaraId], map: "events_pembicara_id_fkey")
   @@map("events")
 }
 
-model Pembicara{
-  id Int @id @default(autoincrement())
-  name String
-  role String
-  image String
-  createdAt DateTime @map("created_at")
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  foto      String
+  createdAt DateTime @default(now()) @map("created_at")
 
-  events Event[] 
+  @@map("users")
+}
 
-  @@map("Pembicaras")
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("roles")
+}
+
+model pembicaras {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  image      String
+  created_at DateTime
+  events     Event[]
 }
